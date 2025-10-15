@@ -1,5 +1,6 @@
-import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sql, relations, InferInsertModel } from "drizzle-orm";
+import { float, foreignKey } from "drizzle-orm/mysql-core";
+import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
 
 /**
  * Authentication schema.
@@ -8,6 +9,9 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
  *
  * Only make changes to these tables if you know what you're doing.
  */
+export const measurementUnits = ["kg", "g", "pcs", "l", "ml"] as const;
+export type MeasurementUnit = (typeof measurementUnits)[number];
+
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -94,3 +98,45 @@ export const demoData = sqliteTable("demo_data", {
   limit: integer("limit").notNull(),
   reviewer: text("reviewer").notNull(),
 });
+
+export const shoppingList = sqliteTable("shoppingList", {
+  id: integer("id").primaryKey(),
+  title: text("title").notNull(),
+});
+
+export const shoppingListUsers = sqliteTable("shoppingListUsers", 
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id),
+    shoppingListId: integer('shoppingList_id')
+      .notNull()
+      .references(() => shoppingList.id),
+  },
+  (t) => [
+		primaryKey({ columns: [t.userId, t.shoppingListId] })
+	],
+);
+
+export const item = sqliteTable("item", {
+  id: integer("id").primaryKey(),
+  productName: text("productName").notNull(),
+  amount: float("amount").notNull(),
+  measurementUnit: text("measurementUnit")
+    .notNull()
+    .$type<MeasurementUnit>(),
+});
+
+export const shoppingListItems = sqliteTable("shoppingListItems", 
+  {
+    itemId: text('item_id')
+      .notNull()
+      .references(() => item.id),
+    shoppingListId: integer('shoppingList_id')
+      .notNull()
+      .references(() => shoppingList.id),
+  },
+  (t) => [
+		primaryKey({ columns: [t.itemId, t.shoppingListId] })
+	],
+);
