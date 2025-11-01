@@ -30,6 +30,7 @@ export type NewShoppingItem = {
   productName: string
   amount: number
   measurementUnit: string
+  priority: number
 }
 
 export type User = {
@@ -91,7 +92,7 @@ export default function Home() {
   }
   
   const handleAddItem = (listId: number, item: NewShoppingItem) => {
-      createItem(listId, item.productName, item.amount, item.measurementUnit)
+      createItem(listId, item.productName, item.amount, item.measurementUnit, item.priority)
   }
 
   const handleRemoveItem = (listId: number, itemId: number) => {

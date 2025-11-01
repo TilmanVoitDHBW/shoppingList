@@ -125,6 +125,7 @@ export const item = sqliteTable("item", {
   measurementUnit: text("measurementUnit")
     .notNull()
     .$type<MeasurementUnit>(),
+  priority: integer("priority").notNull()
 });
 
 export const shoppingListItems = sqliteTable("shoppingListItems", 

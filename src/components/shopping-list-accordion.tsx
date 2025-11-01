@@ -54,7 +54,6 @@ export function ShoppingListAccordion({list, onAddItem, onRemoveItem, onAddUser 
 
   const onRemoveList = () => {
     removeList(list.id)
-    window.location.reload();
   }
 
   return (

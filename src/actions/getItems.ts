@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import {item, shoppingListItems} from "@/db/schema"
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export async function getItems(listId: number){
     const items = await db
@@ -14,7 +14,8 @@ export async function getItems(listId: number){
   })
   .from(shoppingListItems)
   .innerJoin(item, eq(shoppingListItems.itemId, item.id))
-  .where(eq(shoppingListItems.shoppingListId, listId));
+  .where(eq(shoppingListItems.shoppingListId, listId))
+  .orderBy(desc(item.priority));
   console.error("List id: ", listId)
   return items
 

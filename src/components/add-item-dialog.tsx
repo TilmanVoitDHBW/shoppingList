@@ -16,11 +16,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { measurementUnits } from "@/db/schema"
+import { number } from "zod"
 
 type AddItemDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onAddItem: (item: { productName: string; amount: number; measurementUnit: string }) => void
+  onAddItem: (item: { productName: string; amount: number; measurementUnit: string, priority: number }) => void
 }
 
 const UNITS = ["kg", "g", "pcs", "l", "ml"]
@@ -29,6 +30,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
   const [name, setName] = useState("")
   const [amount, setAmount] = useState("")
   const [measurementUnit, setUnit] = useState("pcs")
+  const [priority, setPriority] = useState(0)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +39,7 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
         productName: name.trim(),
         amount: Number.parseFloat(amount),
         measurementUnit: String(measurementUnit),
+        priority: priority
       })
       setName("")
       setAmount("")
@@ -47,63 +50,78 @@ export function AddItemDialog({ open, onOpenChange, onAddItem }: AddItemDialogPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Item</DialogTitle>
-          <DialogDescription>Add a new item to your shopping list</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Item Name</Label>
-              <Input
-                id="name"
-                placeholder="e.g., Milk"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoFocus
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  placeholder="1"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="unit">Unit</Label>
-                <Select value={measurementUnit} onValueChange={setUnit}>
-                  <SelectTrigger id="unit">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UNITS.map((u) => (
-                      <SelectItem key={u} value={u}>
-                        {u}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Add Item</DialogTitle>
+      <DialogDescription>Add a new item to your shopping list</DialogDescription>
+    </DialogHeader>
+    <form onSubmit={handleSubmit}>
+      <div className="space-y-4 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Item Name</Label>
+          <Input
+            id="name"
+            placeholder="e.g., Milk"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="amount">Amount</Label>
+            <Input
+              id="amount"
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="1"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={!name.trim() || !amount || Number.parseFloat(amount) <= 0}>
-              Add Item
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <div className="space-y-2">
+            <Label htmlFor="unit">Unit</Label>
+            <Select value={measurementUnit} onValueChange={setUnit}>
+              <SelectTrigger id="unit">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {UNITS.map((u) => (
+                  <SelectItem key={u} value={u}>
+                    {u}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="priority">
+            Priority ({priority})
+          </Label>
+          <input
+            id="priority"
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value={priority}
+            onChange={(e) => setPriority(Number(e.target.value))}
+            className="w-full accent-blue-500"
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={!name.trim() || !amount || Number.parseFloat(amount) <= 0}>
+          Add Item
+        </Button>
+      </DialogFooter>
+    </form>
+  </DialogContent>
+</Dialog>
   )
 }
